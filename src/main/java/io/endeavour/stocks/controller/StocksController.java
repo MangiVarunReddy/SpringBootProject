@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,6 +71,17 @@ public List<StockFundamentalsWithNamesVO> getAllStockFundamentalsJDBC(){
         return marketAnalyticsService.getAllStockFundamentals();
 }
 
+@PostMapping(value = "/getAllSpecificStocks")
+public List<StockFundamentalsWithNamesVO> getAllSpecificStocks(@RequestBody List<String> tickerSymbols){
+        LOGGER.debug("got tickerSymbols from JSON into getAllSpecificStocks controller : {}",tickerSymbols);
+        return marketAnalyticsService.getAllStockFundamentalsForSpecificTickerSymbols(tickerSymbols);
+}
+
+@PostMapping(value = "/getAllSpecificStocksUsingSqlQuery")
+public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(@RequestBody List<String> tickerSymbols){
+    LOGGER.debug("got tickerSymbols from JSON into getAllSpecificStocksUsingSqlQuery controller : {}",tickerSymbols);
+        return marketAnalyticsService.getAllStockFundamentalsForGivenTickerSymbolsWithSQLQuery(tickerSymbols);
+}
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
 public ResponseEntity generateExceptionResponse(Exception e){
         return ResponseEntity.badRequest().body(e.getMessage());

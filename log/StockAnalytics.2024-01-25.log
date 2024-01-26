@@ -4267,3 +4267,80 @@ where
 2024-01-25 20:16:25.950 [http-nio-65000-exec-1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
 2024-01-25 20:26:53.865 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2024-01-25 20:26:53.868 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-01-25 21:11:22.674 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - Starting StockAnalyticsApplication using Java 17.0.9 on Varuns-Air with PID 1353 (/Users/varunreddy/git_projects/springboot-stockanalytics-va-dec2023/target/classes started by varunreddy in /Users/varunreddy/git_projects/springboot-stockanalytics-va-dec2023)
+2024-01-25 21:11:22.676 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - No active profile set, falling back to 1 default profile: "default"
+2024-01-25 21:11:22.703 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2024-01-25 21:11:22.703 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2024-01-25 21:11:23.147 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2024-01-25 21:11:23.149 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-01-25 21:11:23.157 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 3 ms. Found 0 JPA repository interfaces.
+2024-01-25 21:11:23.267 [restartedMain] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=41205633-9c1c-3456-a947-9b284342afd6
+2024-01-25 21:11:23.661 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 65000 (http)
+2024-01-25 21:11:23.667 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-65000"]
+2024-01-25 21:11:23.668 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-01-25 21:11:23.668 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.70]
+2024-01-25 21:11:23.723 [restartedMain] INFO  o.a.c.c.C.[.[.[/stockanalytics] - Initializing Spring embedded WebApplicationContext
+2024-01-25 21:11:23.723 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1020 ms
+2024-01-25 21:11:23.932 [restartedMain] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2024-01-25 21:11:24.437 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2024-01-25 21:11:24.465 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-65000"]
+2024-01-25 21:11:24.478 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 65000 (http) with context path '/stockanalytics'
+2024-01-25 21:11:24.489 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - Started StockAnalyticsApplication in 2.07 seconds (JVM running for 2.535)
+2024-01-25 21:11:29.963 [http-nio-65000-exec-2] INFO  o.a.c.c.C.[.[.[/stockanalytics] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-01-25 21:11:29.963 [http-nio-65000-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-01-25 21:11:29.965 [http-nio-65000-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2024-01-25 21:11:30.020 [http-nio-65000-exec-2] INFO  i.e.s.controller.StocksController - Values received from the Http Request are : tickerSymbol [AAPL, MSFT, AMD], fromDate 2023-01-01, toDate 2023-01-10
+2024-01-25 21:11:30.025 [http-nio-65000-exec-2] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-01-25 21:11:30.345 [http-nio-65000-exec-2] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-01-25 21:12:35.599 [http-nio-65000-exec-5] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.http.converter.HttpMessageNotReadableException: Required request body is missing: public java.util.List<io.endeavour.stocks.vo.StocksPriceHistoryVO> io.endeavour.stocks.controller.StocksController.getMultipleStockPriceHistory(io.endeavour.stocks.vo.StockPriceHistoryRequestVO)]
+2024-01-25 22:35:19.231 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1h18m48s739ms).
+2024-01-25 22:35:22.932 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-01-25 22:35:22.935 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2024-01-25 23:13:40.864 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - Starting StockAnalyticsApplication using Java 17.0.9 on Varuns-Air with PID 1637 (/Users/varunreddy/git_projects/springboot-stockanalytics-va-dec2023/target/classes started by varunreddy in /Users/varunreddy/git_projects/springboot-stockanalytics-va-dec2023)
+2024-01-25 23:13:40.867 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - No active profile set, falling back to 1 default profile: "default"
+2024-01-25 23:13:40.916 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2024-01-25 23:13:40.917 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2024-01-25 23:13:41.456 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2024-01-25 23:13:41.457 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-01-25 23:13:41.467 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 4 ms. Found 0 JPA repository interfaces.
+2024-01-25 23:13:41.582 [restartedMain] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=41205633-9c1c-3456-a947-9b284342afd6
+2024-01-25 23:13:42.019 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 65000 (http)
+2024-01-25 23:13:42.026 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-65000"]
+2024-01-25 23:13:42.026 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-01-25 23:13:42.026 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.70]
+2024-01-25 23:13:42.079 [restartedMain] INFO  o.a.c.c.C.[.[.[/stockanalytics] - Initializing Spring embedded WebApplicationContext
+2024-01-25 23:13:42.079 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1162 ms
+2024-01-25 23:13:42.285 [restartedMain] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2024-01-25 23:13:42.742 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2024-01-25 23:13:42.775 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-65000"]
+2024-01-25 23:13:42.789 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 65000 (http) with context path '/stockanalytics'
+2024-01-25 23:13:42.801 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - Started StockAnalyticsApplication in 2.309 seconds (JVM running for 2.892)
+2024-01-25 23:14:59.280 [http-nio-65000-exec-1] INFO  o.a.c.c.C.[.[.[/stockanalytics] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-01-25 23:14:59.281 [http-nio-65000-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-01-25 23:14:59.284 [http-nio-65000-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2024-01-25 23:15:18.337 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - Starting StockAnalyticsApplication using Java 17.0.9 on Varuns-Air with PID 1655 (/Users/varunreddy/git_projects/springboot-stockanalytics-va-dec2023/target/classes started by varunreddy in /Users/varunreddy/git_projects/springboot-stockanalytics-va-dec2023)
+2024-01-25 23:15:18.339 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - No active profile set, falling back to 1 default profile: "default"
+2024-01-25 23:15:18.377 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2024-01-25 23:15:18.377 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2024-01-25 23:15:18.832 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2024-01-25 23:15:18.833 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-01-25 23:15:18.841 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 3 ms. Found 0 JPA repository interfaces.
+2024-01-25 23:15:18.938 [restartedMain] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=41205633-9c1c-3456-a947-9b284342afd6
+2024-01-25 23:15:19.307 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 65000 (http)
+2024-01-25 23:15:19.313 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-65000"]
+2024-01-25 23:15:19.313 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-01-25 23:15:19.313 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.70]
+2024-01-25 23:15:19.368 [restartedMain] INFO  o.a.c.c.C.[.[.[/stockanalytics] - Initializing Spring embedded WebApplicationContext
+2024-01-25 23:15:19.368 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 990 ms
+2024-01-25 23:15:19.572 [restartedMain] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2024-01-25 23:15:20.098 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2024-01-25 23:15:20.131 [restartedMain] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-65000"]
+2024-01-25 23:15:20.143 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 65000 (http) with context path '/stockanalytics'
+2024-01-25 23:15:20.154 [restartedMain] INFO  i.e.stocks.StockAnalyticsApplication - Started StockAnalyticsApplication in 2.171 seconds (JVM running for 2.657)
+2024-01-25 23:15:58.409 [http-nio-65000-exec-1] INFO  o.a.c.c.C.[.[.[/stockanalytics] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-01-25 23:15:58.410 [http-nio-65000-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-01-25 23:15:58.411 [http-nio-65000-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2024-01-25 23:15:58.448 [http-nio-65000-exec-1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-01-25 23:15:58.781 [http-nio-65000-exec-1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-01-25 23:16:40.557 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-01-25 23:16:40.559 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
