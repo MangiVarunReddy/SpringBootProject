@@ -78,9 +78,19 @@ public List<StockFundamentalsWithNamesVO> getAllSpecificStocks(@RequestBody List
 }
 
 @PostMapping(value = "/getAllSpecificStocksUsingSqlQuery")
-public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(@RequestBody List<String> tickerSymbols){
+public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(@RequestBody Optional<List<String>> tickerSymbols){
     LOGGER.debug("got tickerSymbols from JSON into getAllSpecificStocksUsingSqlQuery controller : {}",tickerSymbols);
-        return marketAnalyticsService.getAllStockFundamentalsForGivenTickerSymbolsWithSQLQuery(tickerSymbols);
+    if (tickerSymbols.isPresent()){
+        List<String> tickerList = tickerSymbols.get();
+        if (tickerList.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "TickersList is empty or not sent");
+        }else {
+            return marketAnalyticsService.getAllStockFundamentalsForGivenTickerSymbolsWithSQLQuery(tickerList);
+        }
+    }else {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No TickersList empty or not sent");
+    }
+
 }
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
 public ResponseEntity generateExceptionResponse(Exception e){
