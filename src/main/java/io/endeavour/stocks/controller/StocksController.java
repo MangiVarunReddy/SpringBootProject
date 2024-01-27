@@ -1,5 +1,6 @@
 package io.endeavour.stocks.controller;
 
+import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.service.MarketAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
 import io.endeavour.stocks.vo.StockPriceHistoryRequestVO;
@@ -91,6 +92,11 @@ public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(@Req
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No TickersList empty or not sent");
     }
 
+}
+
+@GetMapping(value = "/getAllStockFundamentalsJPA")
+public List<StockFundamentals> getAllStockFundamentalsJPA(){
+        return  marketAnalyticsService.getAllStockFundamentalsWithJPA();
 }
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
 public ResponseEntity generateExceptionResponse(Exception e){
