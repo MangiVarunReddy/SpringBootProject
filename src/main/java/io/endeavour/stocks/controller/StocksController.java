@@ -1,5 +1,6 @@
 package io.endeavour.stocks.controller;
 
+import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.service.MarketAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
@@ -98,6 +99,13 @@ public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(@Req
 public List<StockFundamentals> getAllStockFundamentalsJPA(){
         return  marketAnalyticsService.getAllStockFundamentalsWithJPA();
 }
+
+//"1) Write a GET API to get Sector and Subsector details from the database using JPA
+
+    @GetMapping(value = "/getSectorsWithSubSectorsList")
+    public List<SectorLookup> getSectorsWithSubSectorsList(){
+        return marketAnalyticsService.getAllSectorsWithItsSubSectors();
+    }
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
 public ResponseEntity generateExceptionResponse(Exception e){
         return ResponseEntity.badRequest().body(e.getMessage());

@@ -3,7 +3,9 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.controller.StocksController;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
+import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.repository.stocks.SectorLookupRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
 import io.endeavour.stocks.vo.StocksPriceHistoryVO;
@@ -31,6 +33,9 @@ public class MarketAnalyticsService {
 
     @Autowired
     StockFundamentalsRepository stockFundamentalsRepository;
+
+    @Autowired
+    SectorLookupRepository sectorLookupRepository;
 
     @Autowired
     public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao) {
@@ -88,6 +93,10 @@ public class MarketAnalyticsService {
 
     public List<StockFundamentals> getAllStockFundamentalsWithJPA(){
         return stockFundamentalsRepository.findAll();
+    }
+
+    public  List<SectorLookup> getAllSectorsWithItsSubSectors(){
+        return sectorLookupRepository.findAll();
     }
 
 
