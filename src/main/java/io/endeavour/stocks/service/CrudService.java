@@ -25,4 +25,8 @@ public class CrudService {
     public Optional<Person> getPerson(Integer personID) {
         return personRepository.findById(personID);
     }
+
+    public Person insertPerson(Person person){
+        return  personRepository.save(person);
+    }
 }

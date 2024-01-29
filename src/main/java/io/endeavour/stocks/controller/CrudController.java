@@ -7,10 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -39,6 +36,16 @@ public class CrudController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Person ID not sent");
         }
 
+    }
+
+    @PostMapping(value = "/insertPerson")
+    public Person insertPerson(@RequestBody Optional<Person> personOptional){
+        if (personOptional.isPresent()){
+            return  crudService.insertPerson(personOptional.get());
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Person object sent for insertion is null");
+        }
     }
 
 }
