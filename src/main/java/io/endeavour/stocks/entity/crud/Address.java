@@ -22,7 +22,7 @@ public class Address {
     @Column(name = "state")
     private String state;
     @Column(name = "zip_code")
-    private String zipCode;
+    private Integer zipCode;
 
     public int getAddressID() {
         return addressID;
@@ -32,6 +32,11 @@ public class Address {
     @JsonIgnore
     @JoinColumn(name = "person_id")
     private Person person;
+
+    //Custom get method to get person name field
+    public String getPersonName(){
+        return person.getFirstName()+" "+person.getLastName();
+    }
 
     public void setAddressID(int addressID) {
         this.addressID = addressID;
@@ -69,11 +74,11 @@ public class Address {
         this.state = state;
     }
 
-    public String getZipCode() {
+    public Integer getZipCode() {
         return zipCode;
     }
 
-    public void setZipCode(String zipCode) {
+    public void setZipCode(Integer zipCode) {
         this.zipCode = zipCode;
     }
 

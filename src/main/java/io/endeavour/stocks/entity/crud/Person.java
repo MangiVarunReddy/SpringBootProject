@@ -21,7 +21,7 @@ public class Person {
     @Column(name = "dob")
     private LocalDate DOB;
 
-    @OneToMany(mappedBy = "person",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "person",fetch = FetchType.EAGER,cascade = CascadeType.ALL,orphanRemoval = true)
     List<Address> addressList;
 
     public int getPersonID() {

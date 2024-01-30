@@ -5,8 +5,10 @@ import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
 import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.entity.stocks.SubSectorLookup;
 import io.endeavour.stocks.repository.stocks.SectorLookupRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.repository.stocks.SubSectorRepository;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
 import io.endeavour.stocks.vo.StocksPriceHistoryVO;
 import org.slf4j.Logger;
@@ -36,6 +38,9 @@ public class MarketAnalyticsService {
 
     @Autowired
     SectorLookupRepository sectorLookupRepository;
+
+    @Autowired
+    SubSectorRepository subSectorRepository;
 
     @Autowired
     public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao) {
@@ -97,6 +102,10 @@ public class MarketAnalyticsService {
 
     public  List<SectorLookup> getAllSectorsWithItsSubSectors(){
         return sectorLookupRepository.findAll();
+    }
+
+    public List<SubSectorLookup> getAllSubSectors(){
+        return subSectorRepository.findAll();
     }
 
 

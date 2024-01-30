@@ -20,6 +20,11 @@ public class SubSectorLookup {
     @JoinColumn(name = "sector_id")
     private SectorLookup sectorLookup;
 
+    public String getSectorName(){
+        return sectorLookup.getSectorName();
+
+    }
+
     public Integer getSubSectorID() {
         return subSectorID;
     }
