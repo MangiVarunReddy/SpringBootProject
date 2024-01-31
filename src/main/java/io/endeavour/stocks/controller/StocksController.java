@@ -2,10 +2,7 @@ package io.endeavour.stocks.controller;
 
 import io.endeavour.stocks.entity.stocks.*;
 import io.endeavour.stocks.service.MarketAnalyticsService;
-import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
-import io.endeavour.stocks.vo.StockPriceHistoryRequestVO;
-import io.endeavour.stocks.vo.StocksPriceHistoryVO;
-import io.endeavour.stocks.vo.TopStockBySectorVO;
+import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +123,16 @@ public List<StockFundamentals> getAllStockFundamentalsJPA(){
     public List<TopStockBySectorVO> getTopStockBySector(){
         return marketAnalyticsService.getTopStockBySector();
     }
+
+
+
+    @GetMapping(value = "/getTopThreeStockBySector")
+    public List<SectorNew> getTopThreeStockBySector(){
+        return marketAnalyticsService.getTopThree();
+    }
+
+
+
 
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
 public ResponseEntity generateExceptionResponse(Exception e){

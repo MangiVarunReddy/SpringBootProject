@@ -1,11 +1,15 @@
 package io.endeavour.stocks.entity.stocks;
 
+import io.endeavour.stocks.vo.TopThreeStocksVO;
+
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "sector_lookup",schema = "endeavour")
+
 public class SectorLookup {
 
     @Column(name = "sector_id")
@@ -16,6 +20,17 @@ public class SectorLookup {
 
     @OneToMany(mappedBy ="sectorLookup", fetch = FetchType.EAGER)
    List<SubSectorLookup> subSectorLookupList;
+
+    @OneToMany(mappedBy = "sectorLookup", fetch = FetchType.EAGER)
+    List<StockFundamentals> stockFundamentalsList;
+
+    public List<StockFundamentals> getStockFundamentalsList() {
+        return stockFundamentalsList;
+    }
+
+    public void setStockFundamentalsList(List<StockFundamentals> stockFundamentalsList) {
+        this.stockFundamentalsList = stockFundamentalsList;
+    }
 
     public Integer getSectorID() {
         return sectorID;
@@ -41,6 +56,7 @@ public class SectorLookup {
         this.subSectorLookupList = subSectorLookupList;
     }
 
+
     @Override
     public String toString() {
         return "SectorLookup{" +
@@ -48,6 +64,13 @@ public class SectorLookup {
                 ", sectorName='" + sectorName + '\'' +
                 '}';
     }
+
+
+//    @Override
+//    public String toString() {
+//        return "sectorID=" + sectorID +
+//                ", sectorName='" + sectorName;
+//    }
 
     @Override
     public boolean equals(Object o) {

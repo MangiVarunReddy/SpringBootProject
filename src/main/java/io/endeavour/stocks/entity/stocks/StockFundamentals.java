@@ -2,6 +2,7 @@ package io.endeavour.stocks.entity.stocks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.endeavour.stocks.vo.TopStockBySectorVO;
+import io.endeavour.stocks.vo.TopThreeStocksVO;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -49,6 +50,47 @@ import java.util.Objects;
         }
         )
 )
+@NamedNativeQuery(name = "StocksFundamentalsNew.TopThreeStocks",query = """
+        with MKTCP_RANK_BY_SECTOR as(
+        	select
+        	sf.sector_id,
+        	sl2.sector_name ,
+        	sf.ticker_symbol ,
+        	sl.ticker_name ,
+        	sf.market_cap ,
+        	rank () over(partition by sf.sector_id order by sf.market_cap desc) as MKTCP_RANK
+        from
+        	endeavour.stock_fundamentals sf ,
+        	endeavour.stocks_lookup sl ,
+        	endeavour.sector_lookup sl2
+        where
+        	sf.market_cap is  not null
+        	and sf.ticker_symbol =sl.ticker_symbol
+        	and sl2.sector_id =sf.sector_id
+        )
+        select
+            mrs.sector_id,
+            mrs.sector_name,
+        	mrs.ticker_symbol,
+        	mrs.ticker_name,
+        	mrs.market_cap
+        from
+        	MKTCP_RANK_BY_SECTOR mrs
+        where
+        	MKTCP_RANK<4 
+        """,resultSetMapping = "StocksFundamentalsNew.TopThreeStocksMapping")
+
+@SqlResultSetMapping(name = "StocksFundamentalsNew.TopThreeStocksMapping",
+        classes = @ConstructorResult(targetClass = TopThreeStocksVO.class,
+                columns = {
+                        @ColumnResult(name = "sector_id",type = Integer.class),
+                        @ColumnResult(name = "sector_name",type = String.class),
+                        @ColumnResult(name = "ticker_symbol",type = String.class),
+                        @ColumnResult(name = "ticker_name",type = String.class),
+                        @ColumnResult(name = "market_cap",type = BigDecimal.class)
+                }
+        )
+)
 public class StockFundamentals {
     @Column(name = "ticker_symbol")
     @Id
@@ -59,6 +101,7 @@ public class StockFundamentals {
     private SectorLookup sectorLookup;
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "subsector_id", referencedColumnName = "subsector_id")
     private SubSectorLookup subSectorLookup;
 

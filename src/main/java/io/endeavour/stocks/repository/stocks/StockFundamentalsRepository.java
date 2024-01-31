@@ -10,4 +10,5 @@ import java.util.List;
 public interface StockFundamentalsRepository extends JpaRepository<StockFundamentals,String> {
     @Query(name = "StockFundamentals.TopStockBySector", nativeQuery = true)
     public List<TopStockBySectorVO> getTopStockBySector();
+
 }
