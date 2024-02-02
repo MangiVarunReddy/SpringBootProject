@@ -1,5 +1,8 @@
 package io.endeavour.stocks.entity.stocks;
 
+import io.endeavour.stocks.vo.StockPriceHistoryWithStockFundamentals;
+import io.endeavour.stocks.vo.TopThreeStocksVO;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,6 +11,43 @@ import java.util.Objects;
 @Entity
 @Table(name = "stocks_price_history", schema = "endeavour")
 @IdClass(value = StockPRiceHistoryKey.class) //Add this annotation when the table has a composite primary key
+@NamedNativeQuery(name = "StocksPriceHistory.StockPriceHistoryWithStockFundamentals",query = """
+        select
+        	sl.ticker_name ,
+        	sf.market_cap ,
+        	sf.current_ratio ,
+        	sph.ticker_symbol ,
+        	sph.trading_date ,
+        	sph.close_price ,
+        	sph.open_price,
+        	sph.volume
+        from
+        	endeavour.stock_fundamentals sf ,
+        	endeavour.stocks_price_history sph ,
+        	endeavour.stocks_lookup sl
+        where
+        	sf.current_ratio is not null
+        	and sf.ticker_symbol =sph.ticker_symbol
+        	and sl.ticker_symbol =sf.ticker_symbol
+        	and sph.trading_date between :fromDate AND :toDate
+        	and sf.ticker_symbol =:tickerSymbol
+        order by sf.market_cap desc 
+        """,resultSetMapping = "StocksPriceHistory.StockPriceHistoryWithStockFundamentalsMapping")
+
+@SqlResultSetMapping(name = "StocksPriceHistory.StockPriceHistoryWithStockFundamentalsMapping",
+        classes = @ConstructorResult(targetClass = StockPriceHistoryWithStockFundamentals.class,
+                columns = {
+                        @ColumnResult(name = "ticker_symbol",type = String.class),
+                        @ColumnResult(name = "ticker_name",type = String.class),
+                        @ColumnResult(name = "market_cap",type = BigDecimal.class),
+                        @ColumnResult(name = "current_ratio",type = BigDecimal.class),
+                        @ColumnResult(name = "trading_date",type = LocalDate.class),
+                        @ColumnResult(name = "open_price",type = BigDecimal.class),
+                        @ColumnResult(name = "close_price",type = BigDecimal.class),
+                        @ColumnResult(name = "volume",type = Long.class)
+                }
+        )
+)
 public class StockPriceHistory {
 
     @Column(name = "ticker_symbol")
@@ -22,6 +62,8 @@ public class StockPriceHistory {
     private BigDecimal closePrice;
     @Column(name = "volume")
     private Long volume;
+
+
 
     public String getTickerSymbol() {
         return tickerSymbol;

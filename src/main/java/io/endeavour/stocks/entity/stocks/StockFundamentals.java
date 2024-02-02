@@ -6,6 +6,7 @@ import io.endeavour.stocks.vo.TopThreeStocksVO;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -109,10 +110,13 @@ public class StockFundamentals {
     @JoinColumn(name = "ticker_symbol",referencedColumnName = "ticker_symbol")
     private StocksLookup stocksLookup;
 
+
     @Column(name = "market_cap")
     private BigDecimal marketCap;
     @Column(name = "current_ratio")
     private BigDecimal currentRatio;
+
+
 
     public String getTickerName(){
         return stocksLookup.getTickerName();

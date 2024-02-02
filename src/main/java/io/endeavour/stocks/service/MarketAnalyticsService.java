@@ -4,15 +4,13 @@ import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
 import io.endeavour.stocks.entity.stocks.*;
 import io.endeavour.stocks.repository.stocks.*;
-import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
-import io.endeavour.stocks.vo.StocksPriceHistoryVO;
-import io.endeavour.stocks.vo.TopStockBySectorVO;
-import io.endeavour.stocks.vo.TopThreeStocksVO;
+import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -143,13 +141,104 @@ public class MarketAnalyticsService {
             sectorMap.put(sectorLookup.getSectorID(), sector);
         }
 
-        List<SectorNew> finalResult = new ArrayList<>(sectorMap.values());
+        List<SectorNew> finalResult = (List<SectorNew>) sectorMap.values();
 
-        // Print the final result
-        System.out.println(finalResult);
-
+        System.out.println(sectorMap);
         return finalResult;
 
+    }
+
+    public List<StockFundamentals> getTopNStocksNativeSQL(Integer num){
+        return stockFundamentalsRepository.getTopNStocksNativeSQL(num);
+    }
+
+    public List<StockFundamentals> getTopNStocksJpql(Integer num){
+        return stockFundamentalsWithNamesDao.getTopNStocksJPQL(num);
+    }
+
+    public List<StockFundamentals> getNotNullCurrentRatioStocks(){
+        return stockFundamentalsRepository.getNotNullCurrentRatioStocks();
+    }
+
+    public List<StockFundamentals> getTopNStocksCriteriaAPI(Integer num){
+        return stockFundamentalsWithNamesDao.getTopNStocksCriteriaAPI(num);
+    }
+//"GET /stock-fundamentals/{tickerSymbol}/{fromDate}/{toDate}
+//
+//    {
+//        ""marketCap"": 100,
+//            ""currentRatio: 1,
+//            ""tradingHistory"": [
+//        {
+//            ""tickerSymbol"": ""AAPL"",
+//                ""tradingDate"": ""2023-01-03"",
+//                ""closePrice"": 125.07,
+//                ""volume"": 112117500
+//        },
+//        {
+//            ""tickerSymbol"": ""AAPL"",
+//                ""tradingDate"": ""2023-01-05"",
+//                ""closePrice"": 124.07,
+//                ""volume"": 112117500
+//        }
+//    ]
+//    }"
+    public StockPriceHistoryResultVO getStockBetweenSpecificDates(String tickerSymbol, LocalDate fromDate, LocalDate toDate){
+        //retrived all the raw data
+        List<StockPriceHistoryWithStockFundamentals> listOfNewStockPriceHistory=  stockPriceHistoryRepository.getAllStockHistoryWithFundamentals(tickerSymbol,fromDate,toDate);
+
+        //This is the VO how my data should look like
+        StockPriceHistoryResultVO stockPriceHistoryResultVO=new StockPriceHistoryResultVO();
+
+        //I have grouped the raw data by marketcap and currentratio
+        //I got a map which has an inner map
+        Map<BigDecimal, Map<BigDecimal, List<StockPriceHistoryWithStockFundamentals>>> mapOfStockHistoryGroupedByMarketAndCurrentRatio = listOfNewStockPriceHistory.stream()
+                .collect(Collectors.groupingBy(StockPriceHistoryWithStockFundamentals::getMarketCap,
+                        Collectors.groupingBy(StockPriceHistoryWithStockFundamentals::getCurrentRatio)));
+
+    //I have to get the map key which is marketCap
+        BigDecimal firstKey = mapOfStockHistoryGroupedByMarketAndCurrentRatio.keySet().iterator().next();
+
+        //Retrived the inner map using the key
+        Map<BigDecimal, List<StockPriceHistoryWithStockFundamentals>> innerMap = mapOfStockHistoryGroupedByMarketAndCurrentRatio.get(firstKey);
+
+        //retrived the inner map key
+        BigDecimal secondKey = innerMap.keySet().iterator().next();
+
+        //I have set the marketCap and Current Ratio keys into my result object values
+        stockPriceHistoryResultVO.setMarketCap(firstKey);
+        stockPriceHistoryResultVO.setCurrentRatio(secondKey);
+
+        //At this point i have created an other VO which will represent the innerMap values that is indirectly a list
+        Collection<List<StockPriceHistoryWithStockFundamentals>> innerMapValuesList = innerMap.values();
+
+        //This is to store all the map values into a list
+        List<StockPriceHistoryDataChildVO> stockList = new ArrayList<>();
+
+//In the collection there is only 1 entry under which there are multiple stock list
+        //so i reached that inner list
+        for (List<StockPriceHistoryWithStockFundamentals> stockPriceHistoryWithStockFundamentals : innerMapValuesList) {
+            for (StockPriceHistoryWithStockFundamentals stockPriceHistoryWithStockFundamental : stockPriceHistoryWithStockFundamentals) {
+                //created an object to store the list data
+                StockPriceHistoryDataChildVO stockPriceHistoryDataChildVO=new StockPriceHistoryDataChildVO();
+                stockPriceHistoryDataChildVO.setTickerName(stockPriceHistoryWithStockFundamental.getTickerName());
+                stockPriceHistoryDataChildVO.setTickerSymbol(stockPriceHistoryWithStockFundamental.getTickerSymbol());
+                stockPriceHistoryDataChildVO.setTradingDate(stockPriceHistoryWithStockFundamental.getTradingDate());
+                stockPriceHistoryDataChildVO.setClosePrice(stockPriceHistoryWithStockFundamental.getClosePrice());
+                stockPriceHistoryDataChildVO.setOpenPrice(stockPriceHistoryWithStockFundamental.getOpenPrice());
+                stockPriceHistoryDataChildVO.setVolume(stockPriceHistoryWithStockFundamental.getVolume());
+
+                //set the object into a list, eventually all the list are addeded into my final list
+                stockList.add(stockPriceHistoryDataChildVO);
+            }
+
+        }
+        //setting the stockPriceHistoryDataChildVO into the stockPriceHistoryResultVO
+        stockPriceHistoryResultVO.setStockPriceHistoryDataChildVO(stockList);
+
+
+//returning stockPriceHistoryResultVO
+        return stockPriceHistoryResultVO;
     }
 }
 

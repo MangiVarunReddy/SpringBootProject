@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -131,8 +132,34 @@ public List<StockFundamentals> getAllStockFundamentalsJPA(){
         return marketAnalyticsService.getTopThree();
     }
 
+    @GetMapping(value = "/getTopNStocksNativeSQL")
+public List<StockFundamentals> getTopNStocksNativeSQL(@RequestParam(value = "num") Integer num){
+        return marketAnalyticsService.getTopNStocksNativeSQL(num);
+}
 
+    @GetMapping(value = "/getTopNStocksJpql")
+    public List<StockFundamentals> getTopNStocksJpql(@RequestParam(value = "num") Integer num){
+        return marketAnalyticsService.getTopNStocksJpql(num);
+    }
 
+    @GetMapping(value = "/getNotNullCurrentRatioStocks")
+    public List<StockFundamentals> getNotNullCurrentRatioStocks(){
+        return marketAnalyticsService.getNotNullCurrentRatioStocks();
+    }
+
+    @GetMapping(value = "/getTopNStocksCriteriaAPI")
+    public List<StockFundamentals> getTopNStocksCriteriaAPI(@RequestParam(value = "num") Integer num){
+        return marketAnalyticsService.getTopNStocksCriteriaAPI(num);
+    }
+
+    @GetMapping(value = "/getStockBetweenSpecificDates")
+    public StockPriceHistoryResultVO getStockBetweenSpecificDates(
+            @RequestParam(value = "tickerSymbol") String tickerSymbol,
+           @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+           @RequestParam(value = "toDate")@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate){
+        return marketAnalyticsService.getStockBetweenSpecificDates(tickerSymbol,fromDate,toDate);
+
+    }
 
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
 public ResponseEntity generateExceptionResponse(Exception e){

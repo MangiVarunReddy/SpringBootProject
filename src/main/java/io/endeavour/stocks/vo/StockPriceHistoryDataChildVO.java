@@ -2,18 +2,14 @@ package io.endeavour.stocks.vo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
 
-public class StocksPriceHistoryVO {
-
-
+public class StockPriceHistoryDataChildVO {
     private String tickerSymbol;
+    private String tickerName;
     private LocalDate tradingDate;
     private BigDecimal openPrice;
     private  BigDecimal closePrice;
     private long volume;
-
-
 
     public String getTickerSymbol() {
         return tickerSymbol;
@@ -21,6 +17,14 @@ public class StocksPriceHistoryVO {
 
     public void setTickerSymbol(String tickerSymbol) {
         this.tickerSymbol = tickerSymbol;
+    }
+
+    public String getTickerName() {
+        return tickerName;
+    }
+
+    public void setTickerName(String tickerName) {
+        this.tickerName = tickerName;
     }
 
     public LocalDate getTradingDate() {
@@ -57,25 +61,13 @@ public class StocksPriceHistoryVO {
 
     @Override
     public String toString() {
-        return "StocksPriceHistoryVO{" +
+        return "StockPriceHistoryDataChildVO{" +
                 "tickerSymbol='" + tickerSymbol + '\'' +
-                ", tradingDate='" + tradingDate + '\'' +
+                ", tickerName='" + tickerName + '\'' +
+                ", tradingDate=" + tradingDate +
                 ", openPrice=" + openPrice +
                 ", closePrice=" + closePrice +
                 ", volume=" + volume +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StocksPriceHistoryVO that = (StocksPriceHistoryVO) o;
-        return volume == that.volume && Objects.equals(tickerSymbol, that.tickerSymbol) && Objects.equals(tradingDate, that.tradingDate) && Objects.equals(openPrice, that.openPrice) && Objects.equals(closePrice, that.closePrice);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tickerSymbol, tradingDate, openPrice, closePrice, volume);
     }
 }
