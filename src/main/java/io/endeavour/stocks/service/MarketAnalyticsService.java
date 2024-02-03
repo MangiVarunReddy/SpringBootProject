@@ -3,8 +3,11 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
 import io.endeavour.stocks.entity.stocks.*;
+import io.endeavour.stocks.remote.vo.CRWSInputVO;
+import io.endeavour.stocks.remote.vo.CRWSOutputVO;
 import io.endeavour.stocks.repository.stocks.*;
 import io.endeavour.stocks.vo.*;
+import io.endeavour.stocks.remote.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,9 @@ public class MarketAnalyticsService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MarketAnalyticsService.class);
     StockPriceHistoryDao stockPriceHistoryDao;
+
+    @Autowired
+    StockCalculationsClient stockCalculationsClient;
 
     @Autowired
     StockFundamentalsWithNamesDao stockFundamentalsWithNamesDao;
@@ -38,6 +44,8 @@ public class MarketAnalyticsService {
 
     @Autowired
     StockPriceHistoryRepository stockPriceHistoryRepository;
+
+
 
     @Autowired
     public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao) {
@@ -209,28 +217,24 @@ public class MarketAnalyticsService {
         stockPriceHistoryResultVO.setMarketCap(firstKey);
         stockPriceHistoryResultVO.setCurrentRatio(secondKey);
 
-        //At this point i have created an other VO which will represent the innerMap values that is indirectly a list
-        Collection<List<StockPriceHistoryWithStockFundamentals>> innerMapValuesList = innerMap.values();
+
 
         //This is to store all the map values into a list
         List<StockPriceHistoryDataChildVO> stockList = new ArrayList<>();
 
-//In the collection there is only 1 entry under which there are multiple stock list
-        //so i reached that inner list
-        for (List<StockPriceHistoryWithStockFundamentals> stockPriceHistoryWithStockFundamentals : innerMapValuesList) {
-            for (StockPriceHistoryWithStockFundamentals stockPriceHistoryWithStockFundamental : stockPriceHistoryWithStockFundamentals) {
-                //created an object to store the list data
-                StockPriceHistoryDataChildVO stockPriceHistoryDataChildVO=new StockPriceHistoryDataChildVO();
-                stockPriceHistoryDataChildVO.setTickerName(stockPriceHistoryWithStockFundamental.getTickerName());
-                stockPriceHistoryDataChildVO.setTickerSymbol(stockPriceHistoryWithStockFundamental.getTickerSymbol());
-                stockPriceHistoryDataChildVO.setTradingDate(stockPriceHistoryWithStockFundamental.getTradingDate());
-                stockPriceHistoryDataChildVO.setClosePrice(stockPriceHistoryWithStockFundamental.getClosePrice());
-                stockPriceHistoryDataChildVO.setOpenPrice(stockPriceHistoryWithStockFundamental.getOpenPrice());
-                stockPriceHistoryDataChildVO.setVolume(stockPriceHistoryWithStockFundamental.getVolume());
 
-                //set the object into a list, eventually all the list are addeded into my final list
-                stockList.add(stockPriceHistoryDataChildVO);
-            }
+        for (StockPriceHistoryWithStockFundamentals stockPriceHistoryWithStockFundamental : innerMap.get(secondKey)) {
+            //created an object to store the list data
+            StockPriceHistoryDataChildVO stockPriceHistoryDataChildVO=new StockPriceHistoryDataChildVO();
+            stockPriceHistoryDataChildVO.setTickerName(stockPriceHistoryWithStockFundamental.getTickerName());
+            stockPriceHistoryDataChildVO.setTickerSymbol(stockPriceHistoryWithStockFundamental.getTickerSymbol());
+            stockPriceHistoryDataChildVO.setTradingDate(stockPriceHistoryWithStockFundamental.getTradingDate());
+            stockPriceHistoryDataChildVO.setClosePrice(stockPriceHistoryWithStockFundamental.getClosePrice());
+            stockPriceHistoryDataChildVO.setOpenPrice(stockPriceHistoryWithStockFundamental.getOpenPrice());
+            stockPriceHistoryDataChildVO.setVolume(stockPriceHistoryWithStockFundamental.getVolume());
+
+            //set the object into a list, eventually all the list are addeed into my final list
+            stockList.add(stockPriceHistoryDataChildVO);
 
         }
         //setting the stockPriceHistoryDataChildVO into the stockPriceHistoryResultVO
@@ -239,6 +243,38 @@ public class MarketAnalyticsService {
 
 //returning stockPriceHistoryResultVO
         return stockPriceHistoryResultVO;
+    }
+
+    public List<StockFundamentalsWithNamesVO> getTopNPerformingStocks(Integer num, LocalDate fromDate, LocalDate toDate, Long marketCapLimit){
+//        List<StockFundamentals> allStockList = stockFundamentalsRepository.findAll();
+        List<StockFundamentalsWithNamesVO> allStockList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+        List<String> allTickerList = allStockList.stream()
+                .map(stockFundamentals -> stockFundamentals.getTickerSymbol())
+                .collect(Collectors.toList());
+        LOGGER.info("Number of stocks that are being sent as inputs to the cumulative return web service is {}", allStockList.size());
+        CRWSInputVO crwsInputVO=new CRWSInputVO();
+        crwsInputVO.setTickers(allTickerList);
+        List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
+//        LOGGER.info("Number of stocks returned from the Cumulative Return web service is {}",cumulativeReturnsList.size());
+
+        Map<String, BigDecimal> cumulativeReturnByTickerSymbolMap = cumulativeReturnsList.stream()
+                .collect(Collectors.toMap(
+                        CRWSOutputVO::getTickerSymbol,
+                        CRWSOutputVO::getCumulativeReturn
+                ));
+
+        allStockList.forEach(stockFundamentals -> {
+            stockFundamentals.setCumulativeReturn(cumulativeReturnByTickerSymbolMap.get(stockFundamentals.getTickerSymbol()));
+        });
+
+        List<StockFundamentalsWithNamesVO> finalOutputList = allStockList.stream()
+                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
+                .filter(stockFundamentals -> stockFundamentals.getMarketCap().compareTo(new BigDecimal(marketCapLimit)) > 0)
+                .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getCumulativeReturn).reversed())
+                .limit(num)
+                .collect(Collectors.toList());
+
+        return finalOutputList;
     }
 }
 

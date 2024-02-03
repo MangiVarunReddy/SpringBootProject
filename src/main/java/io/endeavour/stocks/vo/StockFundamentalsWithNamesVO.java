@@ -13,6 +13,16 @@ public class StockFundamentalsWithNamesVO {
     private BigDecimal marketCap;
     private BigDecimal currentRatio;
 
+    private BigDecimal cumulativeReturn;
+
+    public BigDecimal getCumulativeReturn() {
+        return cumulativeReturn;
+    }
+
+    public void setCumulativeReturn(BigDecimal cumulativeReturn) {
+        this.cumulativeReturn = cumulativeReturn;
+    }
+
     public String getTickerSymbol() {
         return tickerSymbol;
     }

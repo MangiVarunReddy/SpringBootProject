@@ -6,6 +6,7 @@ import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -159,6 +160,15 @@ public List<StockFundamentals> getTopNStocksNativeSQL(@RequestParam(value = "num
            @RequestParam(value = "toDate")@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate){
         return marketAnalyticsService.getStockBetweenSpecificDates(tickerSymbol,fromDate,toDate);
 
+    }
+
+    @GetMapping(value ="/getTopNPerformingStocks/{num}" )
+    public List<StockFundamentalsWithNamesVO> getTopNPerformingStocks(
+              @PathVariable(value = "num")  Integer num,
+               @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+              @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
+              @RequestParam(value = "marketCapLimit")  Long marketCapLimit){
+       return marketAnalyticsService.getTopNPerformingStocks(num, fromDate, toDate, marketCapLimit);
     }
 
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})

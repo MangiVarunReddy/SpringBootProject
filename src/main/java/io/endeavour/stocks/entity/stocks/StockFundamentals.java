@@ -106,9 +106,9 @@ public class StockFundamentals {
     @JoinColumn(name = "subsector_id", referencedColumnName = "subsector_id")
     private SubSectorLookup subSectorLookup;
 
-    @OneToOne
-    @JoinColumn(name = "ticker_symbol",referencedColumnName = "ticker_symbol")
-    private StocksLookup stocksLookup;
+//    @OneToOne
+//    @JoinColumn(name = "ticker_symbol",referencedColumnName = "ticker_symbol")
+//    private StocksLookup stocksLookup;
 
 
     @Column(name = "market_cap")
@@ -116,20 +116,29 @@ public class StockFundamentals {
     @Column(name = "current_ratio")
     private BigDecimal currentRatio;
 
+    @Transient
+    private BigDecimal cumulativeReturn;
 
-
-    public String getTickerName(){
-        return stocksLookup.getTickerName();
+    public BigDecimal getCumulativeReturn() {
+        return cumulativeReturn;
     }
 
-    @JsonIgnore
-    public StocksLookup getStocksLookup() {
-        return stocksLookup;
+    public void setCumulativeReturn(BigDecimal cumulativeReturn) {
+        this.cumulativeReturn = cumulativeReturn;
     }
 
-    public void setStocksLookup(StocksLookup stocksLookup) {
-        this.stocksLookup = stocksLookup;
-    }
+    //    public String getTickerName(){
+//        return stocksLookup.getTickerName();
+//    }
+//
+//    @JsonIgnore
+//    public StocksLookup getStocksLookup() {
+//        return stocksLookup;
+//    }
+//
+//    public void setStocksLookup(StocksLookup stocksLookup) {
+//        this.stocksLookup = stocksLookup;
+//    }
 
     public String getTickerSymbol() {
         return tickerSymbol;
