@@ -8,6 +8,8 @@ import io.endeavour.stocks.remote.vo.CRWSOutputVO;
 import io.endeavour.stocks.repository.stocks.*;
 import io.endeavour.stocks.vo.*;
 import io.endeavour.stocks.remote.*;
+import io.endeavour.stocks.vo.webServiceVO.StocksListVO;
+import io.endeavour.stocks.vo.webServiceVO.SubSectorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -246,12 +248,69 @@ public class MarketAnalyticsService {
     }
 
     public List<StockFundamentalsWithNamesVO> getTopNPerformingStocks(Integer num, LocalDate fromDate, LocalDate toDate, Long marketCapLimit){
-//        List<StockFundamentals> allStockList = stockFundamentalsRepository.findAll();
+        List<StockFundamentalsWithNamesVO> allStockList = getStockFundamentalsWithNamesVOS(fromDate, toDate);
+
+        List<StockFundamentalsWithNamesVO> finalOutputList = allStockList.stream()
+                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
+                .filter(stockFundamentals -> stockFundamentals.getMarketCap().compareTo(new BigDecimal(marketCapLimit)) > 0)
+                .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getCumulativeReturn).reversed())
+                .limit(num)
+                .collect(Collectors.toList());
+
+        return finalOutputList;
+    }
+
+    public List<SubSectorVO> getTopFivePerformingStocksForEachSubSector(Integer num,
+                                                                        LocalDate fromDate,
+                                                                        LocalDate toDate){
+        List<StockFundamentalsWithNamesVO> allStockList = getStockFundamentalsWithNamesVOS(fromDate, toDate);
+
+        Map<String, List<StockFundamentalsWithNamesVO>> stockListBySubSectorNameMap = allStockList.stream()
+                .collect(Collectors.groupingBy(StockFundamentalsWithNamesVO::getSubSectorName));
+
+        Map<String, List<StockFundamentalsWithNamesVO>> topStockListBySectorNameMap=new HashMap<>();
+
+        stockListBySubSectorNameMap.forEach((sectorName,stocksList)->{
+            List<StockFundamentalsWithNamesVO> topNPerformingList = stocksList.stream()
+                    .filter(stockFundamentalsWithNamesVO -> stockFundamentalsWithNamesVO.getCumulativeReturn() != null)
+                    .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getCumulativeReturn).reversed())
+                    .limit(num)
+                    .collect(Collectors.toList());
+            topStockListBySectorNameMap.put(sectorName,topNPerformingList);
+        });
+
+        List<SubSectorVO> finalOutputList=new ArrayList<>();
+
+        topStockListBySectorNameMap.forEach((subSectorName,topStockList)->{
+            SubSectorVO subSectorVO=new SubSectorVO();
+            subSectorVO.setSubSectorName(subSectorName);
+            List<StocksListVO> topNStocks=new ArrayList<>();
+            topStockList.forEach(stockFundamentalsWithNamesVO -> {
+                subSectorVO.setSunSectorID(stockFundamentalsWithNamesVO.getSubSectorID());
+                StocksListVO stocksListVO= new StocksListVO();
+                stocksListVO.setTickerSymbol(stockFundamentalsWithNamesVO.getTickerSymbol());
+                stocksListVO.setTickerName(stockFundamentalsWithNamesVO.getTickerName());
+                stocksListVO.setMarketCap(stockFundamentalsWithNamesVO.getMarketCap());
+                stocksListVO.setCumulativeReturn(stockFundamentalsWithNamesVO.getCumulativeReturn());
+                topNStocks.add(stocksListVO);
+
+            });
+            subSectorVO.setTopStocks(topNStocks);
+            finalOutputList.add(subSectorVO);
+
+        });
+        finalOutputList.sort(Comparator.comparing(SubSectorVO::getSubSectorName));
+
+        return finalOutputList;
+    }
+
+    private List<StockFundamentalsWithNamesVO> getStockFundamentalsWithNamesVOS(LocalDate fromDate, LocalDate toDate) {
+        //        List<StockFundamentals> allStockList = stockFundamentalsRepository.findAll();
         List<StockFundamentalsWithNamesVO> allStockList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
         List<String> allTickerList = allStockList.stream()
                 .map(stockFundamentals -> stockFundamentals.getTickerSymbol())
                 .collect(Collectors.toList());
-        LOGGER.info("Number of stocks that are being sent as inputs to the cumulative return web service is {}", allStockList.size());
+//        LOGGER.info("Number of stocks that are being sent as inputs to the cumulative return web service is {}", allStockList.size());
         CRWSInputVO crwsInputVO=new CRWSInputVO();
         crwsInputVO.setTickers(allTickerList);
         List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
@@ -266,15 +325,7 @@ public class MarketAnalyticsService {
         allStockList.forEach(stockFundamentals -> {
             stockFundamentals.setCumulativeReturn(cumulativeReturnByTickerSymbolMap.get(stockFundamentals.getTickerSymbol()));
         });
-
-        List<StockFundamentalsWithNamesVO> finalOutputList = allStockList.stream()
-                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
-                .filter(stockFundamentals -> stockFundamentals.getMarketCap().compareTo(new BigDecimal(marketCapLimit)) > 0)
-                .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getCumulativeReturn).reversed())
-                .limit(num)
-                .collect(Collectors.toList());
-
-        return finalOutputList;
+        return allStockList;
     }
 }
 

@@ -3,10 +3,14 @@ package io.endeavour.stocks.controller;
 import io.endeavour.stocks.entity.stocks.*;
 import io.endeavour.stocks.service.MarketAnalyticsService;
 import io.endeavour.stocks.vo.*;
+import io.endeavour.stocks.vo.webServiceVO.SubSectorVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +21,10 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@Tag(name = "Stocks API", description = "This api genrates cool trends related to US stock market")
 @RequestMapping(value = "/stocks")
 public class StocksController {
 
@@ -41,11 +45,26 @@ public StocksPriceHistoryVO getSamplePriceHistory(){
 }
 
 @GetMapping(value ="getSingleStockPriceHistory/{tickerSymbol}" )
-public List<StocksPriceHistoryVO> getSingleStockPriceHistory(@PathVariable(name = "tickerSymbol") String tickerSymbol,
-                                                             @RequestParam(name = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
-                                                             @RequestParam(name = "toDate") @DateTimeFormat(pattern ="yyyy-MM-dd" ) LocalDate toDate,
-                                                             @RequestParam(name = "sortField") Optional<String>  sortFieldOptional,
-                                                             @RequestParam(name = "sortDirection") Optional<String>  sortDirectionOptional){
+@Operation(method = "StocksPriceHistoryVO",
+        description = "This method returns stock price history of a single stock between specific dates and we also have a sort functionality")
+@ApiResponse(responseCode = "200",description = "Returns a list for same stock how the stock performed every day between given fromDate and toDate")
+@ApiResponse(responseCode = "400", description = "Returns 400 bad request if any of the input is not provided or if the to date is before fromDate")
+public List<StocksPriceHistoryVO> getSingleStockPriceHistory(
+        @PathVariable(name = "tickerSymbol")
+        @Schema(name ="tickerSymbol",description = "Ticker Symbol to which stock you want to check its performance",example = "AAPL")
+        String tickerSymbol,
+        @RequestParam(name = "fromDate")
+        @Schema(name = "fromDate",description = "Provide from date which is nothing but from what date you want to check the performance",example = "2023-01-01")
+        @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+        @RequestParam(name = "toDate")
+        @Schema(name = "fromDate",description = "Provide to date which is nothing but to what date you want to check the performance",example = "20023-01-10")
+        @DateTimeFormat(pattern ="yyyy-MM-dd" ) LocalDate toDate,
+        @RequestParam(name = "sortField")
+        @Schema(name = "sortFieldOptional",description = "Provide the column name by which the table has to be sorted",example = "tickerSymbol")
+        Optional<String> sortFieldOptional,
+        @RequestParam(name = "sortDirection")
+        @Schema(name = "sortDirectionOptional",description = "Provide asc or desc, asc: sorts table in ascending and desc: sorts the table in descending order ",example = "desc")
+        Optional<String>  sortDirectionOptional){
         if (fromDate.isAfter(toDate)){
             throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"fromDate cannot be greater than toDate");
         }
@@ -55,6 +74,8 @@ public List<StocksPriceHistoryVO> getSingleStockPriceHistory(@PathVariable(name 
 }
 
 @PostMapping(value = "/getMultipleStockPriceHistory")
+@Operation(method = "GetMultipleStockPriceHistory", description = "This API will return stock price history for the given" +
+        " list of stocks for given time frame")
 public List<StocksPriceHistoryVO> getMultipleStockPriceHistory(@RequestBody StockPriceHistoryRequestVO stockPriceHistoryRequestVO){
         LOGGER.info("Values received from the Http Request are : tickerSymbol {}, fromDate {}, toDate {}",
                 stockPriceHistoryRequestVO.getTickersList(),stockPriceHistoryRequestVO.getFromDate(),
@@ -78,7 +99,14 @@ public List<StockFundamentalsWithNamesVO> getAllSpecificStocks(@RequestBody List
 }
 
 @PostMapping(value = "/getAllSpecificStocksUsingSqlQuery")
-public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(@RequestBody Optional<List<String>> tickerSymbols){
+@Operation(method = "GetSomeStockFundamentals",description = "Gets the stock information for the given TickerSymbols")
+@ApiResponse(responseCode = "200",description = "Returns List of Stock Fundamental information for the given ticker Symbol")
+@ApiResponse(responseCode = "400",description = "Returns Http 400 Bad Request if the input ticker symbols list is not sent or is empty")
+public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(
+        @RequestBody
+        @Schema(name = "TickersList",description = "List of thicker symbols for which the stock information needs to be retrieved",
+        example = "[\"AAPL\",\"MSFT\",\"NVDA\"]") // here \ is called escape character
+        Optional<List<String>> tickerSymbols){
     LOGGER.debug("got tickerSymbols from JSON into getAllSpecificStocksUsingSqlQuery controller : {}",tickerSymbols);
     if (tickerSymbols.isPresent()){
         List<String> tickerList = tickerSymbols.get();
@@ -90,6 +118,7 @@ public List<StockFundamentalsWithNamesVO> getAllSpecificStocksUsingSqlQuery(@Req
     }else {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No TickersList empty or not sent");
     }
+
 
 }
 
@@ -169,6 +198,16 @@ public List<StockFundamentals> getTopNStocksNativeSQL(@RequestParam(value = "num
               @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
               @RequestParam(value = "marketCapLimit")  Long marketCapLimit){
        return marketAnalyticsService.getTopNPerformingStocks(num, fromDate, toDate, marketCapLimit);
+    }
+
+    @GetMapping(value ="/getTopFivePerformingStocksForEachSubSector/{num}" )
+    public
+    List<SubSectorVO> getTopFivePerformingStocksForEachSubSector(
+            @PathVariable(value = "num")  Integer num,
+            @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+            @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate
+    ){
+        return marketAnalyticsService.getTopFivePerformingStocksForEachSubSector(num, fromDate, toDate);
     }
 
 @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
