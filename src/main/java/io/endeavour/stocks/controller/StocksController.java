@@ -26,6 +26,7 @@ import java.util.Optional;
 @RestController
 @Tag(name = "Stocks API", description = "This api genrates cool trends related to US stock market")
 @RequestMapping(value = "/stocks")
+@CrossOrigin(value = "*")
 public class StocksController {
 
     private static final Logger LOGGER= LoggerFactory.getLogger(StocksController.class);
@@ -73,6 +74,7 @@ public List<StocksPriceHistoryVO> getSingleStockPriceHistory(
         return marketAnalyticsService.getSingleStockPriceHistory(tickerSymbol, fromDate, toDate,sortFieldOptional,sortDirectionOptional);
 }
 
+
 @PostMapping(value = "/getMultipleStockPriceHistory")
 @Operation(method = "GetMultipleStockPriceHistory", description = "This API will return stock price history for the given" +
         " list of stocks for given time frame")
@@ -91,6 +93,18 @@ public List<StockFundamentalsWithNamesVO> getAllStockFundamentalsJDBC(){
         LOGGER.debug("In the getAllStockFundamentsaJDBC() method of the class{} ", getClass());
         return marketAnalyticsService.getAllStockFundamentals();
 }
+
+    @GetMapping(value = "/getHighestMarketCap")
+    public BigDecimal getHighestMarketCap(){
+
+        return marketAnalyticsService.getStockFundamentalMarketCap();
+    }
+
+    @GetMapping(value = "/listOfTopThreeStockFundamentals")
+    public List<StockFundamentalsWithNamesVO> listOfTopThreeStockFundamentals(){
+     return    marketAnalyticsService.getTopThreeStockFundamentsls();
+    }
+
 
 @PostMapping(value = "/getAllSpecificStocks")
 public List<StockFundamentalsWithNamesVO> getAllSpecificStocks(@RequestBody List<String> tickerSymbols){

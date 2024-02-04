@@ -1,5 +1,6 @@
 package io.endeavour.stocks.service;
 
+import io.endeavour.stocks.StockException;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
 import io.endeavour.stocks.entity.stocks.*;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class MarketAnalyticsService {
@@ -92,6 +94,26 @@ public class MarketAnalyticsService {
         List<StockFundamentalsWithNamesVO> stockFundamentalsList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
         return stockFundamentalsList;
     }
+
+    public BigDecimal getStockFundamentalMarketCap() {
+        List<StockFundamentalsWithNamesVO> stockFundamentalsList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+        BigDecimal highestMarketCap = stockFundamentalsList.stream()
+                .map(StockFundamentalsWithNamesVO::getMarketCap) // Extract market cap
+                .max(Comparator.naturalOrder()) // Find the maximum value
+                .orElse(BigDecimal.ZERO);
+        return highestMarketCap;
+    }
+
+    public List<StockFundamentalsWithNamesVO> getTopThreeStockFundamentsls(){
+        List<StockFundamentalsWithNamesVO> stockFundamentalsList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+        List<StockFundamentalsWithNamesVO> listOfStocks = stockFundamentalsList.stream()
+                .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getTickerSymbol))
+                .limit(3)
+                .collect(Collectors.toList());
+        return listOfStocks;
+    }
+
+
 
     public List<StockFundamentalsWithNamesVO> getAllStockFundamentalsForSpecificTickerSymbols(List<String> tickerSymbolList) {
         List<StockFundamentalsWithNamesVO> allStockFundamentalsWithNamesVOList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
@@ -316,6 +338,9 @@ public class MarketAnalyticsService {
         List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
 //        LOGGER.info("Number of stocks returned from the Cumulative Return web service is {}",cumulativeReturnsList.size());
 
+        if (cumulativeReturnsList.isEmpty()||cumulativeReturnsList==null){
+            throw new StockException("Cumulaive Return Webservice is Down");
+        }
         Map<String, BigDecimal> cumulativeReturnByTickerSymbolMap = cumulativeReturnsList.stream()
                 .collect(Collectors.toMap(
                         CRWSOutputVO::getTickerSymbol,
