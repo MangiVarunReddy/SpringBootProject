@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import io.endeavour.stocks.vo.practice.StockFundamentalsWithNamesDetails;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -100,9 +101,14 @@ public List<StockFundamentalsWithNamesVO> getAllStockFundamentalsJDBC(){
         return marketAnalyticsService.getStockFundamentalMarketCap();
     }
 
+    @CrossOrigin(origins = "http://127.0.0.1:5501")
     @GetMapping(value = "/listOfTopThreeStockFundamentals")
-    public List<StockFundamentalsWithNamesVO> listOfTopThreeStockFundamentals(){
-     return    marketAnalyticsService.getTopThreeStockFundamentsls();
+    public List<StockFundamentalsWithNamesDetails> listOfTopThreeStockFundamentals(
+            @RequestParam("limit") Optional<Integer> limit,
+            @RequestParam("field") Optional<String> field,
+            @RequestParam("direction") Optional<String> direction
+    ){
+     return marketAnalyticsService.getTopThreeStockFundamentsls(limit,field,direction);
     }
 
 

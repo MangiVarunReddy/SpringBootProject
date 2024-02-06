@@ -34,6 +34,7 @@ public class Address {
     private Person person;
 
     //Custom get method to get person name field
+    @JsonIgnore
     public String getPersonName(){
         return person.getFirstName()+" "+person.getLastName();
     }

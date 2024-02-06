@@ -9,6 +9,7 @@ import io.endeavour.stocks.remote.vo.CRWSOutputVO;
 import io.endeavour.stocks.repository.stocks.*;
 import io.endeavour.stocks.vo.*;
 import io.endeavour.stocks.remote.*;
+import io.endeavour.stocks.vo.practice.StockFundamentalsWithNamesDetails;
 import io.endeavour.stocks.vo.webServiceVO.StocksListVO;
 import io.endeavour.stocks.vo.webServiceVO.SubSectorVO;
 import org.slf4j.Logger;
@@ -104,13 +105,43 @@ public class MarketAnalyticsService {
         return highestMarketCap;
     }
 
-    public List<StockFundamentalsWithNamesVO> getTopThreeStockFundamentsls(){
+    public List<StockFundamentalsWithNamesDetails>getTopThreeStockFundamentsls(Optional<Integer> limit,Optional<String> field,Optional<String> sortDirection){
         List<StockFundamentalsWithNamesVO> stockFundamentalsList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+        Integer topStockLimit = limit.orElse(5);
+        if (topStockLimit==0){
+            topStockLimit=1;
+        } else if (topStockLimit>50) {
+            topStockLimit=50;
+        }
         List<StockFundamentalsWithNamesVO> listOfStocks = stockFundamentalsList.stream()
                 .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getTickerSymbol))
-                .limit(3)
+                .limit(topStockLimit)
                 .collect(Collectors.toList());
-        return listOfStocks;
+        List<StockFundamentalsWithNamesDetails> stockWithJustMarketCapList=new ArrayList<>();
+        listOfStocks.forEach(stockFundamentalsWithNamesVO -> {
+            StockFundamentalsWithNamesDetails stockFundamentalsWithNamesDetails=new StockFundamentalsWithNamesDetails();
+            stockFundamentalsWithNamesDetails.setTickerSymbol(stockFundamentalsWithNamesVO.getTickerSymbol());
+            stockFundamentalsWithNamesDetails.setTickerName(stockFundamentalsWithNamesVO.getTickerName());
+            stockFundamentalsWithNamesDetails.setMarketCap(stockFundamentalsWithNamesVO.getMarketCap());
+            stockWithJustMarketCapList.add(stockFundamentalsWithNamesDetails);
+        });
+
+        String fieldToSortBy = field.orElse("tickerSymbol");
+        String directionToSortBy = sortDirection.orElse("asc");
+        Comparator sortComparator = switch (fieldToSortBy.toUpperCase()){
+            case ("TICKERSYMBOL")->Comparator.comparing(StockFundamentalsWithNamesDetails::getTickerSymbol);
+            case ("TICKERNAME")->Comparator.comparing(StockFundamentalsWithNamesDetails::getTickerName);
+            case("MARKETCAP")->Comparator.comparing(StockFundamentalsWithNamesDetails::getMarketCap);
+            default -> {
+                throw new IllegalArgumentException("Value Entered for Sort field is Incorrect. Value entered is: " + fieldToSortBy);
+            }
+
+        };
+        if (directionToSortBy.equalsIgnoreCase("desc")) {
+            sortComparator = sortComparator.reversed();
+        }
+        stockWithJustMarketCapList.sort(sortComparator);
+        return stockWithJustMarketCapList;
     }
 
 

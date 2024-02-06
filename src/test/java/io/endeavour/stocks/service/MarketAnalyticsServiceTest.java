@@ -1,6 +1,7 @@
 package io.endeavour.stocks.service;
 
 import io.endeavour.stocks.StockException;
+import io.endeavour.stocks.UnitTestBase;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.remote.vo.CRWSOutputVO;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
@@ -21,9 +22,8 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles({"test"})// these are called spring profiles
-class MarketAnalyticsServiceTest {
+
+class MarketAnalyticsServiceTest extends UnitTestBase {
     @Autowired
     MarketAnalyticsService marketAnalyticsService;
 

@@ -71,6 +71,7 @@ public class Person {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", DOB=" + DOB +
+                ", addressList=" + addressList +
                 '}';
     }
 
